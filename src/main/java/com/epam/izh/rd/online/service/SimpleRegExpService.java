@@ -1,7 +1,5 @@
 package com.epam.izh.rd.online.service;
 
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
-
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,14 +18,11 @@ public class SimpleRegExpService implements RegExpService {
         StringBuilder message = new StringBuilder();
         String value = "";
 
-        try {
-            FileInputStream info = new FileInputStream("/home/egor/IdeaProjects/java-data-handling-template/src/main/resources/sensitive_data.txt");
-            InputStreamReader inputStreamReader = new InputStreamReader(info, "UTF-8");
-            BufferedReader infoReader = new BufferedReader(inputStreamReader, 200);
+        try (FileReader fileReader = new FileReader("src/main/resources/sensitive_data.txt")) {
 
             int i;
 
-            while((i=infoReader.read())!= -1){
+            while((i=fileReader.read())!= -1){
                 message.append((char)i);
             }
 
@@ -66,14 +61,10 @@ public class SimpleRegExpService implements RegExpService {
         StringBuilder value = new StringBuilder();
         String newValue = "";
 
-        try {
-            FileInputStream fileInputStream = new FileInputStream("/home/egor/IdeaProjects/java-data-handling-template/src/main/resources/sensitive_data.txt");
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader, 200);
-
+        try (FileReader fileReader = new FileReader("src/main/resources/sensitive_data.txt")) {
             int i;
 
-            while((i=bufferedReader.read()) != -1) {
+            while((i=fileReader.read()) != -1) {
                 value.append((char) i);
             }
 
@@ -91,10 +82,6 @@ public class SimpleRegExpService implements RegExpService {
                     newValue = newValue.replace(changePlaceHolder, String.valueOf((int) balance));
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
