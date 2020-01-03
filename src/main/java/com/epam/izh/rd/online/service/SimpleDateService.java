@@ -14,7 +14,8 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public String parseDate(LocalDate localDate) {
-        return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+        return localDate.format(formatter);
     }
 
     /**
@@ -25,7 +26,13 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public LocalDateTime parseString(String string) {
-        return null;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == ' ') {
+                string = string.replace(string.charAt(i), 'T');
+            }
+        }
+
+        return LocalDateTime.parse(string);
     }
 
     /**
@@ -37,7 +44,7 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public String convertToCustomFormat(LocalDate localDate, DateTimeFormatter formatter) {
-        return null;
+        return localDate.format(formatter);
     }
 
     /**
@@ -47,7 +54,18 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public long getNextLeapYear() {
-        return 0;
+        LocalDate localDate = LocalDate.now();
+        int year = localDate.getYear();
+        int value = 0;
+
+        for (int i = 1; i < 5; i++) {
+            value = year + i;
+            if (((value % 100) == 0 && (value % 400) == 0) || ((value % 4) == 0 && (value % 100) != 0)) {
+                break;
+            }
+        }
+
+        return value;
     }
 
     /**
@@ -57,7 +75,14 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public long getSecondsInYear(int year) {
-        return 0;
+        long value = 0L;
+
+        if (((year % 100) == 0 && (year % 400) == 0) || ((year % 4) == 0 && (year % 100) != 0)) {
+            value = 366L * 24L * 60L * 60L;
+        } else {
+            value = 365L * 24L * 60L * 60L;
+        }
+        return value;
     }
 
 

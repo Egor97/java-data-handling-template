@@ -1,5 +1,9 @@
 package com.epam.izh.rd.online.service;
 
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SimpleRegExpService implements RegExpService {
 
     /**
@@ -11,7 +15,39 @@ public class SimpleRegExpService implements RegExpService {
      */
     @Override
     public String maskSensitiveData() {
-        return null;
+        StringBuilder message = new StringBuilder();
+        String value = "";
+
+        try (FileReader fileReader = new FileReader("src/main/resources/sensitive_data.txt")) {
+
+            int i;
+
+            while((i=fileReader.read())!= -1){
+                message.append((char)i);
+            }
+
+            Pattern pattern = Pattern.compile("[\\d]{4}\\s(([\\d]{4}\\s){2})[\\d]{4}\\s");
+            Matcher matcher = pattern.matcher(message);
+
+            value = message.toString();
+
+            while(matcher.find()) {
+                String stars = matcher.group(1);
+
+                for (int j = 0; j < stars.length(); j++) {
+                    if (stars.charAt(j) != ' ') {
+                        stars = stars.replace(stars.charAt(j), '*');
+                    }
+                }
+
+
+                value = value.replace(matcher.group(1), stars);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return value.trim();
     }
 
     /**
@@ -22,6 +58,34 @@ public class SimpleRegExpService implements RegExpService {
      */
     @Override
     public String replacePlaceholders(double paymentAmount, double balance) {
-        return null;
+        StringBuilder value = new StringBuilder();
+        String newValue = "";
+
+        try (FileReader fileReader = new FileReader("src/main/resources/sensitive_data.txt")) {
+            int i;
+
+            while((i=fileReader.read()) != -1) {
+                value.append((char) i);
+            }
+
+            Pattern pattern = Pattern.compile("[$][{][\\w[a-zA-Z]]*[}]");
+            Matcher matcher = pattern.matcher(value);
+
+            newValue = new String(value);
+
+            while (matcher.find()) {
+                String changePlaceHolder = matcher.group();
+
+                if (changePlaceHolder.equals("${payment_amount}")) {
+                    newValue = newValue.replace(changePlaceHolder, String.valueOf((int) paymentAmount));
+                } else if (changePlaceHolder.equals("${balance}")) {
+                    newValue = newValue.replace(changePlaceHolder, String.valueOf((int) balance));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newValue.trim();
     }
 }
