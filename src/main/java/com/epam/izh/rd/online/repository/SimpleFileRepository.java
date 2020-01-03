@@ -1,6 +1,7 @@
 package com.epam.izh.rd.online.repository;
 
 import java.io.*;
+import java.net.URL;
 
 public class SimpleFileRepository implements FileRepository {
 
@@ -70,7 +71,26 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public void copyTXTFiles(String from, String to) {
-        return;
+        File dir = new File(from);
+
+        File[] files = dir.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith(".txt")) {
+                    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(from)));
+                         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(to)))) {
+                            int i;
+
+                            while ((i = bufferedReader.read()) != -1) {
+                                bufferedWriter.write((char) i);
+                            }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -82,16 +102,21 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public boolean createFile(String path, String name) {
-        File dir = new File("src" + File.separator + "main" + File.separator + path);
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(path);
 
-        if (dir.exists() && dir.isDirectory()) {
-            System.out.println("sig");
-            File file = new File(dir + File.separator + name);
+        if (resource != null) {
+            File file  = new File(resource.getPath());
 
-            return file.exists();
+            try (FileWriter fileWriter = new FileWriter(file.getPath() + File.separator + name)) {
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
-         return false;
+        return false;
     }
 
     /**
